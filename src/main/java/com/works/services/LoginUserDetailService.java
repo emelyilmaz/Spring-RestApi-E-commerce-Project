@@ -1,0 +1,96 @@
+package com.works.services;
+
+import com.works.configs.JwtUtil;
+import com.works.entities.Admin;
+import com.works.entities.Customer;
+import com.works.entities.Role;
+import com.works.repositories.AdminRepository;
+import com.works.repositories.CustomerRepository;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class LoginUserDetailService implements UserDetailsService {
+    final JwtUtil jwtUtil;
+    final CustomerRepository customerRepository;
+    final AdminRepository adminRepository;
+    final AuthenticationManager authenticationManager;
+
+    public LoginUserDetailService(JwtUtil jwtUtil, CustomerRepository customerRepository, AdminRepository adminRepository,@Lazy AuthenticationManager authenticationManager) {
+        this.jwtUtil = jwtUtil;
+        this.customerRepository = customerRepository;
+        this.adminRepository = adminRepository;
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Customer> optionalCustomer=customerRepository.findByEmailEqualsIgnoreCase(username);
+
+        Optional<Admin> optionalAdmin=adminRepository.findByEmailEqualsIgnoreCase(username);
+
+
+            if(optionalCustomer.isPresent()&&!optionalAdmin.isPresent()){
+                Customer customer=optionalCustomer.get();
+                UserDetails userDetails = new User(
+                        customer.getEmail(),
+                        customer.getPassword(),
+                        customer.isEnabled(),
+                        customer.isTokenExpired(),
+                        true,
+                        true,
+                        roles(customer.getRoles())
+
+                );
+                System.out.println(userDetails.getAuthorities());
+                return userDetails;
+
+
+               }else if(optionalAdmin.isPresent()|| optionalCustomer.isPresent()) {
+                 Admin admin=optionalAdmin.get();
+                UserDetails userDetails = new User(
+                        admin.getEmail(),
+                        admin.getPassword(),
+                        admin.isEnabled(),
+                        admin.isTokenExpired(),
+                        true,
+                        true,
+                        roles(admin.getRoles())
+
+                );
+                return userDetails;
+              }else {throw new UsernameNotFoundException("There is no such user. ");}
+
+    }
+    public Collection roles(List<Role> roles ) {
+        List<GrantedAuthority> ls = new ArrayList<>();
+        for ( Role role : roles ) {
+            ls.add( new SimpleGrantedAuthority( role.getName() ));
+        }
+        System.out.println(ls);
+        return ls;
+
+    }
+
+    /*public Collection role(Role role ) {
+        List<GrantedAuthority> ls = new ArrayList<>();
+
+            ls.add( new SimpleGrantedAuthority( role.getName() ));
+
+        return ls;
+    }*/
+
+
+}
