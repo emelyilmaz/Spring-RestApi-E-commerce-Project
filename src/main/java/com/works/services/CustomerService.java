@@ -1,36 +1,33 @@
 package com.works.services;
 
-import com.works.entities.Category;
+import com.works.entities.Admin;
 import com.works.entities.Customer;
-import com.works.entities.Role;
 import com.works.repositories.CustomerRepository;
 import com.works.utils.REnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.constraints.NotBlank;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
 public class CustomerService {
     final CustomerRepository customerRepository;
     final PasswordEncoder passwordEncoder;
-    final JavaMailSender emailSender;
     final CommonService commonService;
+    final HttpSession session;
 
 
-    public CustomerService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder, JavaMailSender emailSender, CommonService commonService) {
+    public CustomerService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder, CommonService commonService, HttpSession session) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailSender = emailSender;
+
         this.commonService = commonService;
+        this.session = session;
     }
 
     public ResponseEntity register(Customer customer) {
@@ -58,11 +55,10 @@ public class CustomerService {
 
     public ResponseEntity changePassword(String oldPassword, String newPassword) {
         Map<REnum, Object> hm = new LinkedHashMap();
-       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-       String userName = auth.getName();
-       Optional<Customer> optionalCustomer=customerRepository.findByEmailEqualsIgnoreCase(userName);
+       Object object=session.getAttribute("customer");
+       if(object!=null){
+        Customer customer= (Customer) object;
 
-        Customer customer = optionalCustomer.get();
         if (this.passwordEncoder.matches(oldPassword, customer.getPassword())) {
             customer.setPassword(passwordEncoder.encode(newPassword));
             Customer updatedCustomer = customerRepository.save(customer);
@@ -74,64 +70,14 @@ public class CustomerService {
             hm.put(REnum.status, "false");
             return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
         }
+    }else{
+           hm.put(REnum.message, "Session customer is null");
+           hm.put(REnum.status, "false");
+           return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
+       }
     }
 
-    public ResponseEntity forgotPassword(String email) {
-        Map<REnum, Object> hm = new LinkedHashMap();
-        Optional<Customer> optionalCustomer = customerRepository.findByEmailEqualsIgnoreCase(email);
-        Customer customer = optionalCustomer.get();
-        if (optionalCustomer.isPresent()) {
-            UUID uuid = UUID.randomUUID();
-            String verifyCode = uuid.toString();
-            customer.setVerificationCode(uuid.toString());
-            customerRepository.save(customer);
-            String resetPasswordLink = "http://localhost:8092/customer/resetPassword?resettoken=" + verifyCode;
-            try {
-                sendSimpleMessage("emelcesurr@gmail.com", "Password Reset Link", resetPasswordLink);
-                hm.put(REnum.status, "true");
-                hm.put(REnum.result, resetPasswordLink);
-                return new ResponseEntity<>(hm, HttpStatus.OK);
-            } catch (Exception exception) {
-                System.out.println("mail Error" + exception);
-                hm.put(REnum.status, false);
-                hm.put(REnum.error, exception);
-                return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            hm.put(REnum.status, "false");
-            hm.put(REnum.status, "Invalid customer id");
-            return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
-        }
 
-    }
-
-    public ResponseEntity resetPassword(String verificationCode,  String password) {
-        Map<REnum, Object> hm = new LinkedHashMap();
-        Optional<Customer> optionalCustomer = customerRepository.findByVerificationCodeEquals(verificationCode);
-        if (optionalCustomer.isPresent()) {
-            Customer customer = optionalCustomer.get();
-            customer.setPassword(passwordEncoder.encode(password));
-            customer.setVerificationCode(null);
-            customerRepository.save(customer);
-            hm.put(REnum.status, true);
-            return new ResponseEntity<>(hm, HttpStatus.OK);
-
-        } else {
-            hm.put(REnum.status, false);
-            hm.put(REnum.message, "Invalid verification code");
-            return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    public void sendSimpleMessage(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("noreply@baeldung.com");
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        emailSender.send(message);
-
-    }
 
     public ResponseEntity delete(Long id) {
         Map<REnum, Object> hm = new LinkedHashMap();
@@ -149,15 +95,9 @@ public class CustomerService {
     public ResponseEntity update( String firstName, String secondName, String email, String telephone) {
         Map<REnum, Object> hm = new LinkedHashMap();
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String userName = auth.getName();
-            System.out.println("username"+userName);
-             Optional<Customer> optionalCustomer1=customerRepository.findByEmailEqualsIgnoreCase(userName);
-            //Optional<Customer> optionalCustomer = customerRepository.findById(id);
+            Customer oldCustomer= (Customer) session.getAttribute("customer");
             Optional<Customer> customer1 = customerRepository.findByEmailEqualsIgnoreCase(email);
-            if (optionalCustomer1.isPresent()) {
-                Customer oldCustomer = optionalCustomer1.get();
-               // System.out.println(oldCustomer.getRole());
+
                 if ((oldCustomer.getEmail().equals(email)) || !customer1.isPresent()) {
                     System.out.println(oldCustomer.getEmail());
                     String capitalizedName = commonService.capitalizedWords(firstName);
@@ -176,14 +116,10 @@ public class CustomerService {
                     return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
                 }
 
-            } else {
-                hm.put(REnum.status, false);
-                hm.put(REnum.message, "Invalid customer id");
-                return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
-            }
+
         } catch (Exception exception) {
             hm.put(REnum.status, false);
-            System.out.println(exception);
+            hm.put(REnum.message,exception);
             return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
         }
 

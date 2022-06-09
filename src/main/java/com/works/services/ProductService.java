@@ -5,11 +5,11 @@ import com.works.entities.Product;
 import com.works.repositories.CategoryRepository;
 import com.works.repositories.ProductRepository;
 import com.works.utils.REnum;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.*;
 
@@ -20,11 +20,13 @@ public class ProductService {
     final ProductRepository proRepo;
     final CategoryRepository catRepo;
     final CommonService commonService;
+    final CacheManager cacheManager;
 
-    public ProductService(ProductRepository proRepo, CategoryRepository catRepo,CommonService commonService) {
+    public ProductService(ProductRepository proRepo, CategoryRepository catRepo, CommonService commonService, CacheManager cacheManager) {
         this.proRepo = proRepo;
         this.catRepo = catRepo;
         this.commonService=commonService;
+        this.cacheManager = cacheManager;
     }
 
     public ResponseEntity add(Product product) {
@@ -42,6 +44,7 @@ public class ProductService {
             product.setName(capitalizedName);
             product.setCategory(optionalCategory.get());
             Product product1 = proRepo.save(product);
+            cacheManager.getCache("listCacheProduct").clear();
             hm.put(REnum.status, true);
             hm.put(REnum.result, product1);
             return new ResponseEntity<>(hm, HttpStatus.OK);
@@ -55,6 +58,7 @@ public class ProductService {
         Map<REnum, Object> hm = new HashMap<>();
         try {
             proRepo.deleteById(id);
+            cacheManager.getCache("listCacheProduct").clear();
             hm.put(REnum.status, true);
             return new ResponseEntity<>(hm, HttpStatus.OK);
         } catch (Exception ex) {
@@ -81,6 +85,7 @@ public class ProductService {
                 String capitalizedName= commonService.capitalizedWords(product.getName());
                 product.setName(capitalizedName);
                 proRepo.saveAndFlush(product);
+                cacheManager.getCache("listCacheProduct").clear();
                 hm.put(REnum.status, true);
                 hm.put(REnum.message, "Update is successful");
                 return new ResponseEntity<>(hm, HttpStatus.OK);

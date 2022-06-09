@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import java.util.List;
 
@@ -35,9 +36,9 @@ public class Customer {
     @Length(message = "Maximum 60", max = 60)
     private String email;
 
-   // @Length(message = "Maximum 10 min 5",min = 4, max = 10)
+
     @NotBlank(message = "password can not be blank")
-    //@Pattern(message = "Password must contain min one upper,lower letter and 0-9 digit number ", regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\\\S+$)")
+    @Pattern(message = "Password must contain min one upper,lower letter and 0-9 digit number ", regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,})")
     private String password;
 
     private boolean enabled;

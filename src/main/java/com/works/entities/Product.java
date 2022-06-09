@@ -31,6 +31,8 @@ private String detail;
 @Range(message = "price can be between 0 and 99999", min = 0, max = 99999)
 private int price;
 
+private Integer stockQuantity;
+
 @ManyToOne
 @JoinColumn(name="categoryId",referencedColumnName = "id")
 private Category category;

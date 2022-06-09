@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,21 +28,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().formLogin().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-               http.authorizeRequests()
-                .antMatchers("/customer/register","/login","/admin/register").permitAll()
-                .antMatchers("/customer/setting").hasRole("customer")
-                .antMatchers("/customer/changePassword","/customer/resetPassword","/customer/forgotPassword").hasRole("customer")
-                .antMatchers("/customer/changeCustomerEnable","customer/list").hasRole("admin")
-                .antMatchers("/category/add","category/delete","/category/update","/customer/delete").hasRole("admin")
-                .antMatchers("/category/list","basket/add").hasAnyRole("admin","customer");
+        http
+                .authorizeRequests()
+                .antMatchers(getPermitAll()).permitAll()
+                .antMatchers(getCustomerRole()).hasRole("customer")
+                .antMatchers(getAdminRole()).hasRole("admin")
+                .antMatchers(getCustomerAdmin_Role()).hasAnyRole("admin","customer")
+                .and()
+                .formLogin().disable()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class );
 
-       // http.csrf().disable().formLogin().disable();
+
     }
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -54,5 +54,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
+    }
+
+    private String[] getCustomerRole(){
+        String[] customerRole={"/customer/changePassword","/customer/setting",
+                "/basket/add","/basket/delete","/basket/update",
+                "/order/add","/order/delete"};
+        return customerRole;
+    }
+    private String[] getAdminRole(){
+        String[] adminRole={"/category/add","/category/delete","/category/update",
+                "/customer/delete","/customer/list","/customer/changeCustomerEnable",
+                "/product/add","/product/delete","/product/update",
+                "/order/list","/order/getDetail","/admin/changePassword","/admin/setting","/admin/register"};
+        return adminRole;
+    }
+
+    private String[] getCustomerAdmin_Role(){
+        String[] bothRole={
+                "/category/list","/product/list","/product/listbyCategory",
+                "/basket/customer",
+                "/product/search"};
+        return bothRole;
+
+    }
+    private String[] getPermitAll(){
+        String[] permitAll={"/customer/register","/login",
+                "/forgotPassword","/resetPassword"};
+        return permitAll;
     }
 }

@@ -1,18 +1,15 @@
 package com.works.services;
 
 import com.works.entities.Admin;
-import com.works.entities.Customer;
-import com.works.entities.Role;
 import com.works.repositories.AdminRepository;
 import com.works.repositories.RoleRepository;
 import com.works.utils.REnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
@@ -21,12 +18,14 @@ public class AdminService {
   final RoleRepository roleRepository;
   final PasswordEncoder passwordEncoder;
   final CommonService commonService;
+  final HttpSession session;
 
-    public AdminService(AdminRepository adminRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, CommonService commonService) {
+    public AdminService(AdminRepository adminRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, CommonService commonService, HttpSession session) {
         this.adminRepository = adminRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.commonService = commonService;
+        this.session = session;
     }
 
     public ResponseEntity register(Admin admin){
@@ -55,11 +54,9 @@ public class AdminService {
 
     public ResponseEntity changePassword(String oldPassword, String newPassword) {
         Map<REnum, Object> hm = new LinkedHashMap();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userName = auth.getName();
-        Optional<Admin> optionalAdmin=adminRepository.findByEmailEqualsIgnoreCase(userName);
 
-        Admin admin = optionalAdmin.get();
+        Admin admin= (Admin) session.getAttribute("admin");
+
         if (this.passwordEncoder.matches(oldPassword, admin.getPassword())) {
             admin.setPassword(passwordEncoder.encode(newPassword));
             Admin updatedAdmin = adminRepository.save(admin);
@@ -74,18 +71,15 @@ public class AdminService {
     }
 
     public ResponseEntity update( String companyName, String adminName,String adminSurname, String email ) {
+
         Map<REnum, Object> hm = new LinkedHashMap();
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String userName = auth.getName();
-            System.out.println("username"+userName);
-            Optional<Admin> optionalAdmin1=adminRepository.findByEmailEqualsIgnoreCase(userName);
-            //Optional<Customer> optionalCustomer = customerRepository.findById(id);
-            Optional<Admin> admin1 = adminRepository.findByEmailEqualsIgnoreCase(email);
-            if (optionalAdmin1.isPresent()) {
-                Admin oldAdmin = optionalAdmin1.get();
-                if ((oldAdmin.getEmail().equals(email)) || !admin1.isPresent()) {
-                    System.out.println(oldAdmin.getEmail());
+
+            Admin oldAdmin= (Admin) session.getAttribute("admin");
+            Optional<Admin> admin_ByEmail = adminRepository.findByEmailEqualsIgnoreCase(email);
+
+            if ((oldAdmin.getEmail().equals(email)) || !admin_ByEmail.isPresent()) {
+
                     String capitalizedCompanyName = commonService.capitalizedWords(companyName);
                     String capitalizedAdminName = commonService.capitalizedWords(adminName);
                     String capitalizedSurName = commonService.capitalizedWords(adminSurname);
@@ -93,6 +87,7 @@ public class AdminService {
                     oldAdmin.setAdminName(capitalizedAdminName);
                     oldAdmin.setAdminSurname(capitalizedSurName);
                     oldAdmin.setEmail(email);
+
                     adminRepository.saveAndFlush(oldAdmin);
                     hm.put(REnum.status, true);
                     hm.put(REnum.result, oldAdmin);
@@ -103,14 +98,10 @@ public class AdminService {
                     return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
                 }
 
-            } else {
-                hm.put(REnum.status, false);
-                hm.put(REnum.message, "Invalid customer id");
-                return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
-            }
+
         } catch (Exception exception) {
             hm.put(REnum.status, false);
-            System.out.println(exception);
+            hm.put(REnum.message,exception);
             return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
         }
 

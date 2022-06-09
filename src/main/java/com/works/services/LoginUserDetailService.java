@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,12 +28,14 @@ public class LoginUserDetailService implements UserDetailsService {
     final CustomerRepository customerRepository;
     final AdminRepository adminRepository;
     final AuthenticationManager authenticationManager;
+    final HttpSession session;
 
-    public LoginUserDetailService(JwtUtil jwtUtil, CustomerRepository customerRepository, AdminRepository adminRepository,@Lazy AuthenticationManager authenticationManager) {
+    public LoginUserDetailService(JwtUtil jwtUtil, CustomerRepository customerRepository, AdminRepository adminRepository, @Lazy AuthenticationManager authenticationManager, HttpSession session) {
         this.jwtUtil = jwtUtil;
         this.customerRepository = customerRepository;
         this.adminRepository = adminRepository;
         this.authenticationManager = authenticationManager;
+        this.session = session;
     }
 
     @Override
@@ -54,7 +57,8 @@ public class LoginUserDetailService implements UserDetailsService {
                         roles(customer.getRoles())
 
                 );
-                System.out.println(userDetails.getAuthorities());
+
+                session.setAttribute("customer",customer);
                 return userDetails;
 
 
@@ -70,6 +74,7 @@ public class LoginUserDetailService implements UserDetailsService {
                         roles(admin.getRoles())
 
                 );
+                session.setAttribute("admin",admin);
                 return userDetails;
               }else {throw new UsernameNotFoundException("There is no such user. ");}
 

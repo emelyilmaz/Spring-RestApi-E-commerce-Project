@@ -14,13 +14,13 @@ public class Role {
     private Integer id;
     private String name;
 
-
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     List<Admin> admins;
 
 
    // @OneToMany (mappedBy = "role",fetch = FetchType.LAZY, cascade={CascadeType.ALL})
-    @JsonIgnore
+   @JsonIgnore
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     List<Customer> customers;
 

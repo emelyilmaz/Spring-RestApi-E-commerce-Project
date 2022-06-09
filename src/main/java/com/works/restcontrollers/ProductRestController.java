@@ -3,6 +3,7 @@ package com.works.restcontrollers;
 import com.works.entities.Category;
 import com.works.entities.Product;
 import com.works.services.ProductService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,7 +32,7 @@ public class ProductRestController {
 
         return productService.productDelete(id);
     }
-
+    @Cacheable("listCacheProduct")
     @GetMapping("/list")
     public ResponseEntity list(){
 
