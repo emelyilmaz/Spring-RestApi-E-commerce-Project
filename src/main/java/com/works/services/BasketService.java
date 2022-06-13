@@ -29,7 +29,7 @@ public class BasketService {
         this.session = session;
     }
 
-    //for un içinde setleme update fonksiyonunu çağır.
+
 
     public ResponseEntity add(Basket basket) {
         Map<REnum, Object> hm = new LinkedHashMap<>();
@@ -84,7 +84,7 @@ public class BasketService {
 
     public ResponseEntity delete(Long id) {
         Map<REnum, Object> hm = new LinkedHashMap<>();
-        try {
+
             Optional<Basket> optionalBasket = basketRepo.findById(id);
             if (optionalBasket.isPresent()) {
                 basketRepo.deleteById(id);
@@ -98,38 +98,43 @@ public class BasketService {
                 hm.put(REnum.message, "There is not such a basket");
                 return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
             }
-        } catch (Exception ex) {
-            hm.put(REnum.status, false);
-            hm.put(REnum.error, ex.getMessage());
-            return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
-        }
+
     }
 
     public ResponseEntity update(Long id,Integer quantity) {
-        //Burda da stok kontolü yap
         Map<REnum, Object> hm = new LinkedHashMap<>();
         try {
             Optional<Basket> optionalBasket = basketRepo.findById(id);
             if (optionalBasket.isPresent()) {
                 Basket oldBasket=optionalBasket.get();
+                int stockQuantity=oldBasket.getProduct().getStockQuantity();
+                System.out.println(stockQuantity);
+
                 int oldBasketQuantity=oldBasket.getQuantity();
-                Integer difference=oldBasketQuantity-quantity;
-                oldBasket.setQuantity(quantity);
-                basketRepo.saveAndFlush(oldBasket);
-                Product product=oldBasket.getProduct();
-                if(oldBasketQuantity>quantity){
+                System.out.println(oldBasketQuantity);
+                if(quantity<=stockQuantity+oldBasketQuantity){
+                    Integer difference=oldBasketQuantity-quantity;
+                    oldBasket.setQuantity(quantity);
+                    basketRepo.saveAndFlush(oldBasket);
+                    Product product=oldBasket.getProduct();
+                   if(oldBasketQuantity>quantity){
 
-                    product.setStockQuantity(product.getStockQuantity()+difference);
+                       product.setStockQuantity(product.getStockQuantity()-difference);
+                  }else{
+
+                       product.setStockQuantity(product.getStockQuantity()+difference);
+                  }
+                   productRepository.save(product);
+
+                   hm.put(REnum.status, true);
+                   hm.put(REnum.message, "Update is successful");
+                   hm.put(REnum.result,oldBasket);
+                    return new ResponseEntity<>(hm, HttpStatus.OK);
                 }else{
-
-                    product.setStockQuantity(product.getStockQuantity()-difference);
+                    hm.put(REnum.status, false);
+                    hm.put(REnum.message, "Not enough stock.You can add maximum '"+(stockQuantity+oldBasketQuantity)+"'" );
+                    return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
                 }
-                productRepository.save(product);
-
-                hm.put(REnum.status, true);
-                hm.put(REnum.message, "Update is successful");
-                System.out.println("if" + hm);
-                return new ResponseEntity<>(hm, HttpStatus.OK);
             } else {
                 hm.put(REnum.status, false);
                 hm.put(REnum.message, "There is not such a basket");

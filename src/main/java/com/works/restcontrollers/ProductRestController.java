@@ -1,6 +1,8 @@
 package com.works.restcontrollers;
 
+import com.works.configs.Anotaions.CurrentUser;
 import com.works.entities.Category;
+import com.works.entities.Login;
 import com.works.entities.Product;
 import com.works.services.ProductService;
 import org.springframework.cache.annotation.Cacheable;
@@ -33,10 +35,17 @@ public class ProductRestController {
         return productService.productDelete(id);
     }
     @Cacheable("listCacheProduct")
+
     @GetMapping("/list")
     public ResponseEntity list(){
 
         return productService.list();
+    }
+
+    @GetMapping("/list/company")
+    public ResponseEntity listByCompany(){
+
+        return productService.listByCompany();
     }
 
     @PutMapping("/update")

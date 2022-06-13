@@ -19,8 +19,8 @@ public class Role {
     List<Admin> admins;
 
 
-   // @OneToMany (mappedBy = "role",fetch = FetchType.LAZY, cascade={CascadeType.ALL})
-   @JsonIgnore
+
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     List<Customer> customers;
 

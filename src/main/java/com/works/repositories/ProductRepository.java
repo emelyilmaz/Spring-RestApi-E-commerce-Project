@@ -15,6 +15,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByCategory_IdEquals(Integer id);
 
+    List<Product> findByCreatedByEqualsIgnoreCase(String createdBy);
+
+
 
 
 }

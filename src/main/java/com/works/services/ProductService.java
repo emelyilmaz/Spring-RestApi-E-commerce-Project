@@ -1,18 +1,16 @@
 package com.works.services;
 
-import com.works.entities.Category;
-import com.works.entities.Product;
+import com.works.entities.*;
 import com.works.repositories.CategoryRepository;
 import com.works.repositories.ProductRepository;
 import com.works.utils.REnum;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.*;
-
 
 
 @Service
@@ -21,12 +19,16 @@ public class ProductService {
     final CategoryRepository catRepo;
     final CommonService commonService;
     final CacheManager cacheManager;
+    final HttpSession session;
 
-    public ProductService(ProductRepository proRepo, CategoryRepository catRepo, CommonService commonService, CacheManager cacheManager) {
+
+    public ProductService(ProductRepository proRepo, CategoryRepository catRepo, CommonService commonService, CacheManager cacheManager, HttpSession session) {
         this.proRepo = proRepo;
         this.catRepo = catRepo;
         this.commonService=commonService;
         this.cacheManager = cacheManager;
+
+        this.session = session;
     }
 
     public ResponseEntity add(Product product) {
@@ -103,9 +105,10 @@ public class ProductService {
 
     public ResponseEntity list() {
         Map<REnum, Object> hm = new HashMap<>();
-        List<Product> products = proRepo.findAll();
+
+        List<Product> productList = proRepo.findAll();
         hm.put(REnum.status, true);
-        hm.put(REnum.result, products);
+        hm.put(REnum.result, productList);
         return new ResponseEntity<>(hm, HttpStatus.OK);
 
     }
@@ -140,6 +143,22 @@ public class ProductService {
             hm.put(REnum.status,false);
             hm.put(REnum.message,"There is not such category id ");
             return new ResponseEntity<>(hm,HttpStatus.BAD_REQUEST);
+        }
+
+    }
+    public ResponseEntity listByCompany()  {
+        Map<REnum, Object> hm = new HashMap<>();
+
+        Admin admin= (Admin) session.getAttribute("admin");
+
+        if (admin!=null){
+            List<Product> productList=proRepo.findByCreatedByEqualsIgnoreCase(admin.getEmail());
+            hm.put(REnum.status, true);
+            hm.put(REnum.result, productList);
+            return new ResponseEntity<>(hm, HttpStatus.OK);
+        }else{
+            hm.put(REnum.status, false);
+            return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
         }
 
     }

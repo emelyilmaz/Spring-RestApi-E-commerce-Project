@@ -22,9 +22,6 @@ public class Category extends Base{
     private String categoryName;
 
 
-    /*@OneToMany(mappedBy = "category",fetch = FetchType.LAZY,cascade = CascadeType.)
-    @Ignore
-    private  List<Product> productList;*/
 
 
 }

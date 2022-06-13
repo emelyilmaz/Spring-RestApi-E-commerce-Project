@@ -18,10 +18,8 @@ public class Orders extends Base{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.DATE)
-
-
-    //private Date deliveredDate;
+ /*   @Temporal(TemporalType.DATE)
+    private Date deliveredDate;*/
 
 
     @ManyToOne
@@ -29,7 +27,7 @@ public class Orders extends Base{
     private Customer customer;
 
 
-    @OneToMany
+    @OneToMany(cascade ={CascadeType.ALL})
     @JoinTable(name="Order_Basket",joinColumns = @JoinColumn(name="order_id" ),
             inverseJoinColumns = @JoinColumn(name="basket_id",referencedColumnName ="id")
     )

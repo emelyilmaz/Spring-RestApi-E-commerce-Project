@@ -18,8 +18,8 @@ public class OrdersRestController {
 
 
     @PostMapping("/add")
-    public ResponseEntity add(@RequestBody Orders orders){
-        return ordersService.add(orders);
+    public ResponseEntity add(){
+        return ordersService.add();
     }
 
     @DeleteMapping("/delete")
@@ -37,6 +37,12 @@ public class OrdersRestController {
     public ResponseEntity list(){
 
         return ordersService.list();
+    }
+
+    @GetMapping("/customer")
+    public ResponseEntity getOrderByCustomer(){
+
+        return ordersService.getOrderByCustomer();
     }
 }
 

@@ -47,8 +47,7 @@ final AdminRepository adminRepository;
     public ResponseEntity auth(Login login) {
         Map<REnum, Object> hm = new LinkedHashMap<>();
         try {
-            System.out.println(login.getUsername());
-            System.out.println(login.getPassword());
+
             authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(
                     login.getUsername(), login.getPassword()
             ) );
@@ -82,12 +81,12 @@ final AdminRepository adminRepository;
                 Customer customer = optionalCustomer.get();
                 customer.setVerificationCode(uuid.toString());
                 customerRepository.save(customer);
-                sendSimpleMessage("emelcesurr@gmail.com", "Password Reset Link", resetPasswordLink);
+                sendSimpleMessage(customer.getEmail(), "Password Reset Link", resetPasswordLink);
             }else{
                 Admin admin=optionalAdmin.get();
                 admin.setVerificationCode(verifyCode);
                 adminRepository.save(admin);
-                sendSimpleMessage("emelcesurr@gmail.com", "Password Reset Link", resetPasswordLink);
+                sendSimpleMessage(admin.getEmail(), "Password Reset Link", resetPasswordLink);
             }
                 hm.put(REnum.status, "true");
                 hm.put(REnum.result, resetPasswordLink);

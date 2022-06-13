@@ -1,6 +1,8 @@
 package com.works.configs;
 
 import com.works.utils.REnum;
+import io.jsonwebtoken.MalformedJwtException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +28,15 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class, TransactionSystemException.class, ConstraintViolationException.class} )
+    @ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class, TransactionSystemException.class,
+            ConstraintViolationException.class,
+            DataIntegrityViolationException.class, MalformedJwtException.class} )
     protected ResponseEntity myFnc( Exception ex ) {
         if ( ex instanceof IllegalStateException ) {
             IllegalStateException il = (IllegalStateException) ex;
             System.out.println( il.getMessage() );
-        }if(ex instanceof ConstraintViolationException){
+        }
+        if(ex instanceof ConstraintViolationException){
 
             Map<REnum, Object> hm = new LinkedHashMap<>();
             List<String> details = ((ConstraintViolationException) ex).getConstraintViolations()
@@ -42,6 +47,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
              hm.put(REnum.message,details);
 
             return new ResponseEntity<>(hm, BAD_REQUEST);
+        }
+        if(ex instanceof DataIntegrityViolationException){
+            Map<REnum, Object> hm = new LinkedHashMap<>();
+           String exMessage=ex.getMessage();
+            hm.put(REnum.status,false);
+            hm.put(REnum.message,exMessage);
+            return new ResponseEntity<>(hm, BAD_REQUEST);
+
         }
 
         return null;

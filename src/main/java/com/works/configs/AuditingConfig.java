@@ -18,7 +18,6 @@ public class AuditingConfig {
             @Override
             public Optional<String> getCurrentAuditor() {
                 String name = SecurityContextHolder.getContext().getAuthentication().getName();
-                System.out.println(name);
                 Optional<String> opt = Optional.of(name);
                 return opt;
             }

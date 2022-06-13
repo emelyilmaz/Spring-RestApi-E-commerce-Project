@@ -42,6 +42,7 @@ public class AdminService {
             admin.setAdminName(capitalizedName);
             admin.setAdminSurname(capitalizedSecondName);
             admin.setCompanyName(capitalizedCompanyName);
+            admin.setEmail(admin.getEmail().toLowerCase(new java.util.Locale("en","US")));
             admin.setPassword(passwordEncoder.encode(admin.getPassword()));
             Admin adminNew=adminRepository.save(admin);
             hm.put(REnum.status,true);

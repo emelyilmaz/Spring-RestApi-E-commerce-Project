@@ -17,19 +17,11 @@ public class Basket extends Base{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private Orders orders;
-
-
     @NotNull
     @ManyToOne()
     @JoinColumn(name = "product_id")
     Product product;
 
-//    @ManyToOne
-//    @JoinColumn(name = "customerID")
-//    private Customer customer;
 
     boolean status=false;
 
