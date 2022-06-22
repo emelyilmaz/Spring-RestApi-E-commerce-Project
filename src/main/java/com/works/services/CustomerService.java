@@ -1,6 +1,7 @@
 package com.works.services;
 
 import com.works.entities.Customer;
+import com.works.entities.Role;
 import com.works.repositories.CustomerRepository;
 import com.works.utils.REnum;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,12 @@ public class CustomerService {
             customer.setSecondName(capitalizedSecondName);
             customer.setPassword(passwordEncoder.encode(customer.getPassword()));
             customer.setEmail(customer.getEmail().toLowerCase(new java.util.Locale("en","US")));
+            List<Role> roles=new ArrayList<>();
+            Role role=new Role();
+            role.setId(3);
+            role.setName("ROLE_customer");
+            roles.add(role);
+            customer.setRoles(roles);
             Customer customerNew = customerRepository.save(customer);
             hm.put(REnum.status, true);
             hm.put(REnum.result, customerNew);

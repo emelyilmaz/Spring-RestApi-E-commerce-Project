@@ -24,7 +24,7 @@ public class CustomBean {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
         mailSender.setUsername("javalover138@gmail.com");
-        mailSender.setPassword("***************");
+        mailSender.setPassword("whufskttsvqwawlv");
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");

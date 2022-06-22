@@ -11,6 +11,7 @@ import javax.validation.constraints.Pattern;
 
 @RestController
 @Validated
+@CrossOrigin(origins = "http://localhost:3000")
 public class LoginRestController {
 
 final LoginService loginService;

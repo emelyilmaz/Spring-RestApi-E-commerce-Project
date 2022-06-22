@@ -23,14 +23,14 @@ public class Admin extends Base{
 
 
     @NotBlank(message = "Company name can not be blank")
-    @Length(message = "Company name must contain min 2 max  5o character.", min = 2, max = 50)
+    @Length(message = "Company name must contain min 2 max  50 character.", min = 2, max = 50)
     private String companyName;
 
     @NotBlank(message = "Admin name can not be blank")
     @Length(message = "Admin name must contain min 2 max  5O character.", min = 2, max = 50)
     private String adminName;
 
-    @NotBlank(message = "admin surname can not be blank")
+    @NotBlank(message = "Admin surname can not be blank")
     @Length(message = "Admin surname must contain min 2 max  5O character.", min = 2, max = 50)
     private String adminSurname;
 
@@ -39,14 +39,14 @@ public class Admin extends Base{
     @Email(message = "Email Format Error")
     private String email;
 
-   // @Length(message = "Maximum 10 min 3",min = 5, max = 10)
-    @NotBlank(message = "password can not be blank")
+
+    @NotBlank(message = "Password can not be blank")
     @Pattern(message = "Password must contain min one upper,lower letter and 0-9 digit number ",
             regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,})")
-    //@Pattern(message = "Password must contain min one upper,lower letter and 0-9 digit number ", regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\\\S+$)")
+
     private String password;
 
-    private boolean enabled;
+    private boolean enabled=true;
     private boolean tokenExpired;
     private String verificationCode;
 

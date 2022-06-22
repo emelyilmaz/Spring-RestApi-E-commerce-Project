@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,10 +32,11 @@ final CustomerRepository customerRepository;
 final PasswordEncoder passwordEncoder;
 final JavaMailSender emailSender;
 final AdminRepository adminRepository;
+    final HttpSession session;
 
 
 
-    public LoginService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, LoginUserDetailService loginUserDetailService, CustomerRepository customerRepository, PasswordEncoder passwordEncoder, JavaMailSender emailSender, AdminRepository adminRepository) {
+    public LoginService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, LoginUserDetailService loginUserDetailService, CustomerRepository customerRepository, PasswordEncoder passwordEncoder, JavaMailSender emailSender, AdminRepository adminRepository, HttpSession session) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.loginUserDetailService = loginUserDetailService;
@@ -42,6 +44,7 @@ final AdminRepository adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailSender = emailSender;
         this.adminRepository = adminRepository;
+        this.session = session;
     }
 
     public ResponseEntity auth(Login login) {
@@ -53,16 +56,26 @@ final AdminRepository adminRepository;
             ) );
 
             UserDetails userDetails = loginUserDetailService.loadUserByUsername(login.getUsername());
-
+            Admin admin = (Admin) session.getAttribute("admin");
+            Customer customer = (Customer) session.getAttribute("customer");
 
             String jwt = jwtUtil.generateToken(userDetails);
             hm.put(REnum.status, true);
+            if(admin !=null){
+            hm.put(REnum.result,admin);
+            }
+            else {
+                hm.put(REnum.result,customer);
+            }
+
             hm.put( REnum.jwt, jwt );
+
             return new ResponseEntity(hm, HttpStatus.OK);
         }catch (Exception ex) {
             hm.put(REnum.status, false);
             hm.put( REnum.error, ex.getMessage() );
-            return new ResponseEntity(hm, HttpStatus.NOT_ACCEPTABLE);
+            hm.put(REnum.message,"Your email address or password is wrong");
+            return new ResponseEntity(hm, HttpStatus.BAD_REQUEST);
         }
 
     }

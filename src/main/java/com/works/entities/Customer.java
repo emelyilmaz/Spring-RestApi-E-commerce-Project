@@ -18,17 +18,17 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "firstName  can not be blank")
-    @Length(message = "firstName  must contain min 2 max  5o character.", min = 2, max = 50)
+    @NotBlank(message = "First name  can not be blank")
+    @Length(message = "First name  must contain min 2 max 50 character.", min = 2, max = 50)
     private String firstName;
 
 
-    @NotBlank(message = "secondName  can not be blank")
-    @Length(message = "secondName  must contain min 2 max  5O character.", min = 2, max = 50)
+    @NotBlank(message = "Second name  can not be blank")
+    @Length(message = "Second name  must contain min 2 max 50 character.", min = 2, max = 50)
     private String secondName;
 
-    @NotBlank(message = "telephone can not be blank")
-    @Length(message = "telephone must contain min 10 max  5O character.", min = 2, max = 50)
+    @NotBlank(message = "Telephone number can not be blank")
+    @Length(message = "Telephone must contain min 10 max 50 character.", min = 2, max = 50)
     private String telephone;
 
     @NotBlank(message = "Email can not be blank")
@@ -37,11 +37,11 @@ public class Customer {
     private String email;
 
 
-    @NotBlank(message = "password can not be blank")
+    @NotBlank(message = "Password can not be blank")
     @Pattern(message = "Password must contain min one upper,lower letter and 0-9 digit number ", regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,})")
     private String password;
 
-    private boolean enabled;
+    private boolean enabled=true;
     private boolean tokenExpired;
     private String verificationCode;
 
