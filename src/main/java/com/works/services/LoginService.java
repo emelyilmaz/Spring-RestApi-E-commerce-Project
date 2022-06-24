@@ -102,17 +102,18 @@ final AdminRepository adminRepository;
                 sendSimpleMessage(admin.getEmail(), "Password Reset Link", resetPasswordLink);
             }
                 hm.put(REnum.status, "true");
+                hm.put(REnum.message,"Password Reset Link sent your email address.Please check email");
                 hm.put(REnum.result, resetPasswordLink);
                 return new ResponseEntity<>(hm, HttpStatus.OK);
             } catch (Exception exception) {
-                System.out.println("mail Error" + exception);
+
                 hm.put(REnum.status, false);
                 hm.put(REnum.error, exception);
                 return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
             }
         } else {
             hm.put(REnum.status, "false");
-            hm.put(REnum.status, "There is not such a e-mail address");
+            hm.put(REnum.message, "There is not such a e-mail address");
             return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
         }
 
