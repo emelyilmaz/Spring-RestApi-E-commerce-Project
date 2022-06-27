@@ -87,7 +87,7 @@ final AdminRepository adminRepository;
         if (optionalCustomer.isPresent()||optionalAdmin.isPresent()) {
             UUID uuid = UUID.randomUUID();
             String verifyCode = uuid.toString();
-            String resetPasswordLink = "http://localhost:8092/resetPassword?resettoken=" + verifyCode;
+            String resetPasswordLink = "http://localhost:3000/resetPassword?resettoken=" + verifyCode;
 
             try {
             if (optionalCustomer.isPresent()) {
@@ -136,6 +136,7 @@ final AdminRepository adminRepository;
              admin.setPassword(passwordEncoder.encode(password));
              admin.setVerificationCode(null);
              hm.put(REnum.status, true);
+
              return new ResponseEntity<>(hm, HttpStatus.OK);
 
          }  else {

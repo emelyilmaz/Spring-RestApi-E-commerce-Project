@@ -42,7 +42,7 @@ public class Customer {
     private String password;
 
     private boolean enabled=true;
-    private boolean tokenExpired;
+    private boolean tokenExpired=true;
     private String verificationCode;
 
     @JsonIgnore

@@ -20,7 +20,7 @@ import javax.validation.constraints.Pattern;
 @RequestMapping("/customer")
 
 @Validated
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 
 public class CustomerRestController {
     final CustomerService customerService;

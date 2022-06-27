@@ -16,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/product")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ProductRestController {
     final ProductService productService;
 
@@ -34,9 +35,11 @@ public class ProductRestController {
 
         return productService.productDelete(id);
     }
+
     @Cacheable("listCacheProduct")
 
     @GetMapping("/list")
+
     public ResponseEntity list(){
 
         return productService.list();
