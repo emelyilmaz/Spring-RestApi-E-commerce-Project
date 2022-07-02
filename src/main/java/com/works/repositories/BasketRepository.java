@@ -11,7 +11,10 @@ public interface BasketRepository extends JpaRepository<Basket, Long> {
 
     List<Basket> findByCreatedByEqualsAndStatusFalse(String createdBy);
 
-    List<Basket> findByCreatedByEqualsIgnoreCase(String createdBy);
+   //admin için kullanacaksın List<Basket> findByCreatedByEqualsIgnoreCase(String createdBy);
+
+    List<Basket> findByStatusFalseAndCreatedByIsIgnoreCase(String createdBy);
+
 
 
 

@@ -59,14 +59,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private String[] getCustomerRole(){
         String[] customerRole={"/customer/changePassword","/customer/setting",
-                "/basket/add","/basket/delete","/basket/update",
+                "/basket/add","/basket/delete","/basket/update","/basket/customer",
                 "/order/add","/order/delete","/order/customer","/product/list"};
         return customerRole;
     }
     private String[] getAdminRole(){
         String[] adminRole={"/category/add","/category/delete","/category/update",
                 "/customer/delete","/customer/list","/customer/changeCustomerEnable",
-                "/product/add","/product/delete","/product/update","/basket/customer",
+                "/product/add","/product/delete","/product/update",
                 "/order/list","/order/getDetail","/admin/changePassword","/admin/setting"};
         return adminRole;
     }

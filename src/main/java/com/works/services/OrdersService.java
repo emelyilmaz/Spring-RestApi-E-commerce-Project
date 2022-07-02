@@ -35,36 +35,51 @@ public class OrdersService {
         this.productRepository = productRepository;
     }
 
-    public ResponseEntity add() {
+    public ResponseEntity add(Basket[]  baskets) {
         Map<REnum, Object> hm = new LinkedHashMap<>();
         Orders orders=new Orders();
         int sum=0;
         Customer customer= (Customer) session.getAttribute("customer");
-        if(customer!=null) {
-            List<Basket> baskets = basketRepository.findByCreatedByEqualsAndStatusFalse(customer.getEmail() );
+        try {
+            if (customer != null) {
+                //List<Basket> baskets = basketRepository.findByCreatedByEqualsAndStatusFalse(customer.getEmail() );
+                System.out.println("1"+baskets[0]);
+                if (baskets.length > 0) {
+                    System.out.println("2"+baskets[0]);
+                  List<Basket> basketList=  Arrays.asList(baskets);
+                    System.out.println("3"+baskets[0]);
+                    orders.setCustomer(customer);
+                    orders.setBaskets(basketList);
+                    System.out.println("4"+baskets[0]);
 
-            if (baskets.size() > 0) {
-                orders.setCustomer(customer);
-                orders.setBaskets(baskets);
-                for (Basket item : baskets) {
-                    sum = sum + item.getProduct().getPrice() * item.getQuantity();
-                    item.setStatus(true);
-                    basketRepository.saveAndFlush(item);
+                    for (Basket item : baskets) {
+                        System.out.println("item"+item.getQuantity());
+                        sum = sum + item.getProduct().getPrice() * item.getQuantity();
+                        item.setStatus(true);
+                        basketRepository.saveAndFlush(item);
+                        System.out.println("1");
+                    }
+                    orders.setTotal(sum);
+                    ordersRepository.save(orders);
+                    System.out.println("2");
+                    hm.put(REnum.status, true);
+                    hm.put(REnum.result, orders);
+                    return new ResponseEntity<>(hm, HttpStatus.OK);
+                } else {
+                    hm.put(REnum.status, false);
+                    hm.put(REnum.message, "Basket is empty");
+                    return new ResponseEntity<>(hm, HttpStatus.NOT_ACCEPTABLE);
                 }
-                orders.setTotal(sum);
-                ordersRepository.save(orders);
-                hm.put(REnum.status, true);
-                hm.put(REnum.result, orders);
-                return new ResponseEntity<>(hm, HttpStatus.OK);
             } else {
                 hm.put(REnum.status, false);
-                hm.put(REnum.message, "Basket is empty");
+                hm.put(REnum.message, "No such a customer ");
                 return new ResponseEntity<>(hm, HttpStatus.NOT_ACCEPTABLE);
             }
-        }else {
+
+        }catch (Exception ex){
             hm.put(REnum.status, false);
-            hm.put(REnum.message, "No such a customer ");
-            return new ResponseEntity<>(hm, HttpStatus.NOT_ACCEPTABLE);
+            System.out.println(ex);
+            return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
         }
 
     }

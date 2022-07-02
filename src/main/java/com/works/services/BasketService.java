@@ -70,7 +70,7 @@ public class BasketService {
             } else {
                 hm.put(REnum.status, false);
                 hm.put(REnum.message, "Not enough stock");
-                return new ResponseEntity<>(hm, HttpStatus.OK);
+                return new ResponseEntity<>(hm, HttpStatus.BAD_REQUEST);
             }
 
 
@@ -152,7 +152,8 @@ public class BasketService {
 
     public ResponseEntity getBasketList_by_Customer(String email){
         Map<REnum, Object> hm = new HashMap<>();
-        List<Basket> baskets=basketRepo.findByCreatedByEqualsIgnoreCase(email);
+        List<Basket> baskets=basketRepo.findByStatusFalseAndCreatedByIsIgnoreCase(email);
+
         hm.put(REnum.status, true);
         hm.put(REnum.result, baskets);
         return new ResponseEntity<>(hm, HttpStatus.OK);

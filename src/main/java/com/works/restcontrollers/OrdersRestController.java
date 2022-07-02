@@ -1,10 +1,15 @@
 package com.works.restcontrollers;
 
+import com.works.entities.Basket;
 import com.works.entities.Orders;
 import com.works.services.OrdersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.List;
+
+@CrossOrigin
 @RestController
 @RequestMapping("order")
 public class OrdersRestController {
@@ -18,8 +23,9 @@ public class OrdersRestController {
 
 
     @PostMapping("/add")
-    public ResponseEntity add(){
-        return ordersService.add();
+    public ResponseEntity add( @RequestBody Basket[] baskets){
+
+        return ordersService.add( baskets);
     }
 
     @DeleteMapping("/delete")
