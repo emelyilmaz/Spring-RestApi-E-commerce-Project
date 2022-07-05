@@ -6,7 +6,7 @@ This project offers a Rest API application that allows multiple companies to mak
 - In the project, services were provided for roles with the jwt method.The security configuration has been created so that one role of the customer is one of the admin.
 However, the entity and role relationship has been created as many-to-many so that the project can be easily adapted according to the needs.
 
-- Login, forgot password, reset password is designed as a common service for all roles.
+- Login, forgot password, reset password is designed as a common service for all roles.The url link with the verification code string query is sent to the e-mail address of the user who logs in to the forgot password service.
 
 - In the project, the data to be consumed regularly in case of need has been worked with cache methods and the cost of the application has been brought to the optimum level. (You can check the category listing service.)
 
