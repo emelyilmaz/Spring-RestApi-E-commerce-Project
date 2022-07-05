@@ -4,11 +4,10 @@ import com.works.entities.Category;
 import com.works.repositories.CategoryRepository;
 import com.works.utils.REnum;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.*;
 
@@ -19,12 +18,14 @@ public class CategoryService {
 
     final CategoryRepository catRepo;
     final CommonService commonService;
+    final CacheManager cacheManager;
 
 
-    public CategoryService(CategoryRepository catRepo,CommonService commonService) {
+    public CategoryService(CategoryRepository catRepo, CommonService commonService, CacheManager cacheManager) {
 
         this.catRepo = catRepo;
         this.commonService=commonService;
+        this.cacheManager = cacheManager;
     }
 
     public ResponseEntity add(Category category) {
@@ -34,6 +35,7 @@ public class CategoryService {
             String capitalizedName= commonService.capitalizedWords(category.getCategoryName());
             category.setCategoryName(capitalizedName);
             Category category1 = catRepo.save(category);
+            cacheManager.getCache("listCacheCategory").clear();
             hm.put(REnum.status, true);
             hm.put(REnum.result, category1);
             return new ResponseEntity<>(hm, HttpStatus.OK);
@@ -50,6 +52,7 @@ public class CategoryService {
         Map<REnum, Object> hm = new LinkedHashMap<>();
         try {
             catRepo.deleteById(id);
+            cacheManager.getCache("listCacheCategory").clear();
             hm.put(REnum.status, true);
             return new ResponseEntity<>(hm, HttpStatus.OK);
         } catch (Exception ex) {
@@ -67,6 +70,7 @@ public class CategoryService {
                 String capitalizedName=commonService.capitalizedWords(category.getCategoryName());
                 category.setCategoryName(capitalizedName);
                 catRepo.saveAndFlush(category);
+                cacheManager.getCache("listCacheCategory").clear();
                 hm.put(REnum.status, true);
                 hm.put(REnum.message, "Update is successful");
                 System.out.println("if" + hm);

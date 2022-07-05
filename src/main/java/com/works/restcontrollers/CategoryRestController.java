@@ -3,6 +3,7 @@ package com.works.restcontrollers;
 import com.works.entities.Category;
 import com.works.services.CategoryService;
 import com.works.utils.REnum;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -34,6 +35,7 @@ public class CategoryRestController {
         return catService.delete(id);
     }
 
+    @Cacheable("listCacheCategory")
     @GetMapping("/list")
     public ResponseEntity list(){
 

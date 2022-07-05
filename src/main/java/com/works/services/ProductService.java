@@ -18,16 +18,13 @@ public class ProductService {
     final ProductRepository proRepo;
     final CategoryRepository catRepo;
     final CommonService commonService;
-    final CacheManager cacheManager;
     final HttpSession session;
 
 
-    public ProductService(ProductRepository proRepo, CategoryRepository catRepo, CommonService commonService, CacheManager cacheManager, HttpSession session) {
+    public ProductService(ProductRepository proRepo, CategoryRepository catRepo, CommonService commonService, HttpSession session) {
         this.proRepo = proRepo;
         this.catRepo = catRepo;
         this.commonService=commonService;
-        this.cacheManager = cacheManager;
-
         this.session = session;
     }
 
@@ -46,7 +43,6 @@ public class ProductService {
             product.setName(capitalizedName);
             product.setCategory(optionalCategory.get());
             Product product1 = proRepo.save(product);
-            cacheManager.getCache("listCacheProduct").clear();
             hm.put(REnum.status, true);
             hm.put(REnum.result, product1);
             return new ResponseEntity<>(hm, HttpStatus.OK);
@@ -60,7 +56,6 @@ public class ProductService {
         Map<REnum, Object> hm = new HashMap<>();
         try {
             proRepo.deleteById(id);
-            cacheManager.getCache("listCacheProduct").clear();
             hm.put(REnum.status, true);
             return new ResponseEntity<>(hm, HttpStatus.OK);
         } catch (Exception ex) {
@@ -87,7 +82,7 @@ public class ProductService {
                 String capitalizedName= commonService.capitalizedWords(product.getName());
                 product.setName(capitalizedName);
                 proRepo.saveAndFlush(product);
-                cacheManager.getCache("listCacheProduct").clear();
+
                 hm.put(REnum.status, true);
                 hm.put(REnum.message, "Update is successful");
                 return new ResponseEntity<>(hm, HttpStatus.OK);

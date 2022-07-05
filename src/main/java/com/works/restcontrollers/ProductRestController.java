@@ -36,7 +36,7 @@ public class ProductRestController {
         return productService.productDelete(id);
     }
 
-    //@Cacheable("listCacheProduct")
+
 
     @GetMapping("/list")
 
