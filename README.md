@@ -21,16 +21,16 @@ However, the entity and role relationship has been created as many-to-many so th
 
 
 ## Project Display Image
-<br>
+
 <p>
-<p>                            Database Diagram  </p>
+<p>  Database Diagram  </p>
  <a href="https://github.com/emelyilmaz/Spring-RestApi-E-commerce-Project/blob/main/images/Database%20Diagram.JPG" target="_blank">
-<img src="https://github.com/emelyilmaz/Spring-RestApi-E-commerce-Project/blob/main/images/Database%20Diagram.JPG" width="550" style="max-width:100%;"></a>
+<img src="https://github.com/emelyilmaz/Spring-RestApi-E-commerce-Project/blob/main/images/Database%20Diagram.JPG" width="650" style="max-width:100%;"></a>
 </p>
-<br>
+
 <p>
-<p>                                   Role table by services  </p>
+<p>  Role table by services  </p>
  <a href="https://github.com/emelyilmaz/Spring-RestApi-E-commerce-Project/blob/main/images/Role.jpeg" target="_blank">
-<img src="https://github.com/emelyilmaz/Spring-RestApi-E-commerce-Project/blob/main/images/Role.jpeg" width="550" style="max-width:100%;"></a>
+<img src="https://github.com/emelyilmaz/Spring-RestApi-E-commerce-Project/blob/main/images/Role.jpeg" width="650" style="max-width:100%;"></a>
 </p>
 <br>
