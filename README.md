@@ -9,3 +9,5 @@ However, the entity and role relationship has been created as many-to-many so th
 - Login, forgot password, reset password is designed as a common service for all roles.
 
 - In the project, the data to be consumed regularly in case of need has been worked with cache methods and the cost of the application has been brought to the optimum level. (You can check the category listing service.)
+
+- Postman and Swagger tools have been used in the documentation of this project and have been adapted to OpenApi standards.
